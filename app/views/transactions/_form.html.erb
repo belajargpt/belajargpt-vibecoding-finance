@@ -1,0 +1,10 @@
+<%= form_with model: transaction, class: "transaction-form" do |form| %>
+  <%= form.number_field :amount_cents, required: true, min: 1 %>
+  <%= form.select :direction, Transaction.directions.keys.map { |d| [ d.humanize, d ] }, { selected: transaction.direction } %>
+  <%= form.select :category, Transaction::CATEGORIES[transaction.direction.to_s] || [], { selected: transaction.category } %>
+  <%= form.date_field :occurred_on, required: true %>
+  <%= form.text_field :description, placeholder: "catatan singkat" %>
+  <%= form.submit "Simpan" %>
+  <%= button_to "Hapus", transaction, method: :delete, data: { turbo_confirm: "Hapus transaksi ini?" }, class: "danger" %>
+  <%= link_to "Batal", transactions_path, class: "cancel" %>
+<% end %>

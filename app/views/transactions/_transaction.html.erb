@@ -1,0 +1,13 @@
+<%= turbo_frame_tag dom_id(transaction) do %>
+  <article id="<%= dom_id(transaction) %>" class="transaction transaction-<%= transaction.direction %>">
+    <div class="transaction-date"><%= l(transaction.occurred_on, format: :long) rescue transaction.occurred_on.to_s %></div>
+    <div class="transaction-body">
+      <span class="transaction-description"><%= transaction.description.presence || "-" %></span>
+      <span class="transaction-category">· <%= transaction.category %></span>
+    </div>
+    <div class="transaction-amount">
+      <%= transaction.income? ? "+" : "-" %><%= rupiah(transaction.amount_cents) %>
+    </div>
+    <%= link_to "Edit", edit_transaction_path(transaction), class: "transaction-edit" %>
+  </article>
+<% end %>

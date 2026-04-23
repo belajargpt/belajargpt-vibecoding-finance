@@ -1,4 +1,11 @@
 class Transaction < ApplicationRecord
+  # Prepend to the Ledger list on create, replace in place on update, remove on destroy.
+  # Subscribes under the Owner (chat_message.user) so a single stream handles both
+  # Chat and Ledger screen updates.
+  after_create_commit -> { broadcast_prepend_later_to chat_message.user, target: "transactions", partial: "transactions/transaction", locals: { transaction: self } }
+  after_update_commit -> { broadcast_replace_later_to chat_message.user, target: "transaction_#{id}", partial: "transactions/transaction", locals: { transaction: self } }
+  after_destroy_commit -> { broadcast_remove_to chat_message.user, target: "transaction_#{id}" }
+
   CATEGORIES = {
     "expense" => [
       "Makanan & Minuman",

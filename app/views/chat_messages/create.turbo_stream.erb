@@ -1,0 +1,11 @@
+<%# Append the outgoing bubble and a placeholder thinking bubble. The job
+    broadcasts a replace against "thinking_<id>" once parsing completes. %>
+<%= turbo_stream.append "messages" do %>
+  <%= render "chat_messages/message", chat_message: @chat_message %>
+  <%= render "chat_messages/thinking", chat_message: @chat_message %>
+<% end %>
+
+<%# Clear the input field. %>
+<%= turbo_stream.update "chat_form" do %>
+  <%= render "chat_messages/form" %>
+<% end %>

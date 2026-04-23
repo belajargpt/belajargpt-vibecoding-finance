@@ -1,0 +1,8 @@
+<%= form_with model: ChatMessage.new, url: chat_messages_path, data: { turbo_frame: "_top" }, class: "chat-form" do |form| %>
+  <%= form.text_field :content,
+        placeholder: "Tulis transaksi... (misal: beli kopi 25rb)",
+        autofocus: true,
+        autocomplete: "off",
+        required: true %>
+  <%= form.submit "Kirim" %>
+<% end %>

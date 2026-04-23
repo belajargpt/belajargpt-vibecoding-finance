@@ -1,5 +1,23 @@
-<%# Stubbed in U1 so the root route resolves after login. Fleshed out in U4/U5. %>
-<div class="p-6 text-sm text-gray-500">
-  Chat screen coming in U5.
-  <%= button_to "Log out", session_path, method: :delete, class: "mt-4 text-blue-600 underline" %>
-</div>
+<%= turbo_stream_from Current.user %>
+
+<section class="chat">
+  <div id="messages" class="messages">
+    <% @chat_messages.each do |chat_message| %>
+      <%= render "chat_messages/message", chat_message: chat_message %>
+      <% case chat_message.parser_status %>
+      <% when "logged" %>
+        <%= render "chat_messages/confirmation", chat_message: chat_message %>
+      <% when "not_transaction" %>
+        <%= render "chat_messages/reply", chat_message: chat_message %>
+      <% when "failed" %>
+        <%= render "chat_messages/error", chat_message: chat_message %>
+      <% when "pending" %>
+        <%= render "chat_messages/thinking", chat_message: chat_message %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div id="chat_form" class="chat-form-wrapper">
+    <%= render "chat_messages/form" %>
+  </div>
+</section>

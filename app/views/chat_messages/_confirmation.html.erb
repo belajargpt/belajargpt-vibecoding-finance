@@ -1,0 +1,28 @@
+<%# Replaces the thinking bubble when the Parser Agent logged one or more
+    transactions. Tappable: opens the first transaction's inline edit form. %>
+<div id="thinking_<%= chat_message.id %>" class="bubble bubble-incoming bubble-confirmation" data-chat-message-id="<%= chat_message.id %>">
+  <% entries = chat_message.transactions.order(:id) %>
+  <% if entries.size == 1 %>
+    <% tx = entries.first %>
+    <span class="check">✓</span>
+    <%= link_to edit_transaction_path(tx), data: { turbo_frame: dom_id(tx) } do %>
+      Logged: <strong><%= rupiah(tx.amount_cents) %></strong>
+      <%= tx.category %>
+      <% if tx.description.present? %>(<%= tx.description %>)<% end %>
+    <% end %>
+  <% else %>
+    <span class="check">✓</span>
+    Logged <%= entries.size %> items:
+    <ul>
+      <% entries.each do |tx| %>
+        <li>
+          <%= link_to edit_transaction_path(tx), data: { turbo_frame: dom_id(tx) } do %>
+            <strong><%= rupiah(tx.amount_cents) %></strong>
+            <%= tx.category %>
+            <% if tx.description.present? %>(<%= tx.description %>)<% end %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

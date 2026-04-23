@@ -1,4 +1,12 @@
-<%# Stubbed in U1. Fleshed out in U5 (Ledger view). %>
-<div class="p-6 text-sm text-gray-500">
-  Ledger coming in U5.
-</div>
+<%= turbo_stream_from Current.user %>
+
+<section class="ledger">
+  <h1>Ledger</h1>
+  <div id="transactions" class="transactions">
+    <% if @transactions.empty? %>
+      <p class="empty">Belum ada transaksi. Mulai chat di Chat screen.</p>
+    <% else %>
+      <%= render partial: "transactions/transaction", collection: @transactions, as: :transaction %>
+    <% end %>
+  </div>
+</section>
