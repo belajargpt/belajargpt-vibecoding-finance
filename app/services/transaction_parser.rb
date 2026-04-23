@@ -27,11 +27,15 @@ class TransactionParser
     @chat_message = chat_message
   end
 
+  # Jumlah pesan terakhir yang di-include sebagai context supaya Parser Agent
+  # bisa menghubungkan follow-up ("3rb") ke pesan sebelumnya ("abis beli batagor").
+  HISTORY_WINDOW = 4
+
   def parse
     response = RubyLLM.chat
       .with_instructions(system_prompt)
       .with_schema(ParseSchema)
-      .ask(@chat_message.content)
+      .ask(user_turn)
 
     build_result(response.content)
   rescue RubyLLM::Error, Timeout::Error, Faraday::Error => e
@@ -40,6 +44,39 @@ class TransactionParser
   end
 
   private
+    # Wrap current message with recent history so Claude can resolve follow-ups.
+    # History is rendered inside the user turn (bukan system prompt) supaya
+    # Claude perlakukan sebagai transkrip percakapan, bukan instruksi tetap.
+    def user_turn
+      history = recent_history
+      return @chat_message.content if history.blank?
+
+      lines = [ "KONTEKS PERCAKAPAN SEBELUMNYA (paling lama ke paling baru):" ]
+      history.each do |prev|
+        lines << %(- User: "#{prev.content}")
+        next if prev.reply_text.blank?
+        tag = case prev.parser_status
+              when "logged"          then " (sudah kecatat: #{prev.transactions.count} transaksi)"
+              when "not_transaction" then " (belum kecatat — mungkin nunggu jawaban user)"
+              when "failed"          then " (gagal parse)"
+              else ""
+              end
+        lines << %(  Kamu: "#{prev.reply_text}"#{tag})
+      end
+      lines << ""
+      lines << "PESAN SEKARANG DARI USER (parse ini; pakai konteks di atas kalau pesan ini follow-up):"
+      lines << @chat_message.content
+      lines.join("\n")
+    end
+
+    def recent_history
+      @chat_message.user.chat_messages
+        .where.not(id: @chat_message.id)
+        .order(created_at: :desc)
+        .limit(HISTORY_WINDOW)
+        .reverse
+    end
+
     def build_result(parsed)
       entries = Array(parsed["entries"]).map(&:symbolize_keys)
 
