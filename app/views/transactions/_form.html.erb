@@ -1,10 +1,45 @@
-<%= form_with model: transaction, class: "transaction-form" do |form| %>
-  <%= form.number_field :amount_cents, required: true, min: 1 %>
-  <%= form.select :direction, Transaction.directions.keys.map { |d| [ d.humanize, d ] }, { selected: transaction.direction } %>
-  <%= form.select :category, Transaction::CATEGORIES[transaction.direction.to_s] || [], { selected: transaction.category } %>
-  <%= form.date_field :occurred_on, required: true %>
-  <%= form.text_field :description, placeholder: "catatan singkat" %>
-  <%= form.submit "Simpan" %>
-  <%= button_to "Hapus", transaction, method: :delete, data: { turbo_confirm: "Hapus transaksi ini?" }, class: "danger" %>
-  <%= link_to "Batal", transactions_path, class: "cancel" %>
+<%= form_with model: transaction,
+      data: { controller: "category-filter" },
+      class: "p-4 bg-gray-50 border-l-4 border-blue-500 space-y-3" do |form| %>
+
+  <div class="flex gap-2">
+    <%= form.number_field :amount_cents,
+          required: true,
+          min: 1,
+          class: "flex-1 rounded border border-gray-300 px-3 py-2 text-sm" %>
+    <%= form.select :direction,
+          Transaction.directions.keys.map { |d| [ d.humanize, d ] },
+          {},
+          data: { category_filter_target: "direction", action: "change->category-filter#refresh" },
+          class: "rounded border border-gray-300 px-3 py-2 text-sm" %>
+  </div>
+
+  <%= form.select :category,
+        (Transaction::CATEGORIES[transaction.direction.to_s] || []).map { |c| [ c, c ] },
+        { selected: transaction.category },
+        data: { category_filter_target: "category" },
+        class: "w-full rounded border border-gray-300 px-3 py-2 text-sm" %>
+
+  <%= form.date_field :occurred_on,
+        required: true,
+        class: "w-full rounded border border-gray-300 px-3 py-2 text-sm" %>
+
+  <%= form.text_field :description,
+        placeholder: "catatan singkat",
+        class: "w-full rounded border border-gray-300 px-3 py-2 text-sm" %>
+
+  <script type="application/json" data-category-filter-target="catalog">
+    <%= Transaction::CATEGORIES.to_json.html_safe %>
+  </script>
+
+  <div class="flex gap-2 items-center pt-2">
+    <%= form.submit "Simpan",
+          class: "rounded bg-blue-600 text-white px-4 py-2 text-sm font-semibold hover:bg-blue-500 cursor-pointer" %>
+    <%= button_to "Hapus", transaction,
+          method: :delete,
+          data: { turbo_confirm: "Hapus transaksi ini?" },
+          class: "rounded bg-red-600 text-white px-4 py-2 text-sm font-semibold hover:bg-red-500 cursor-pointer" %>
+    <%= link_to "Batal", transactions_path,
+          class: "ml-auto text-sm text-gray-600 hover:underline" %>
+  </div>
 <% end %>

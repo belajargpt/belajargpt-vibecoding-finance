@@ -1,4 +1,5 @@
-<%# Parser Agent returned a non-transaction reply (sapaan or clarifying). %>
-<div id="thinking_<%= chat_message.id %>" class="bubble bubble-incoming bubble-reply">
-  <%= chat_message.reply_text %>
+<div id="thinking_<%= chat_message.id %>" class="flex justify-start px-3 my-1">
+  <div class="max-w-[80%] rounded-2xl rounded-bl-sm bg-white px-3 py-2 text-sm text-gray-700 shadow-sm">
+    <%= chat_message.reply_text %>
+  </div>
 </div>

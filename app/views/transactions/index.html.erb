@@ -1,10 +1,13 @@
+<% content_for :title, "Ledger" %>
+
 <%= turbo_stream_from Current.user %>
 
-<section class="ledger">
-  <h1>Ledger</h1>
-  <div id="transactions" class="transactions">
+<section class="bg-white min-h-[calc(100dvh-3.5rem)]">
+  <div id="transactions" class="divide-y divide-gray-100">
     <% if @transactions.empty? %>
-      <p class="empty">Belum ada transaksi. Mulai chat di Chat screen.</p>
+      <div class="py-16 text-center text-sm text-gray-500 px-6">
+        Belum ada transaksi. Mulai chat di <%= link_to "Chat", root_path, class: "text-blue-600 underline" %>.
+      </div>
     <% else %>
       <%= render partial: "transactions/transaction", collection: @transactions, as: :transaction %>
     <% end %>

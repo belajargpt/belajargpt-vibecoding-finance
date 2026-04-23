@@ -1,28 +1,36 @@
-<%# Replaces the thinking bubble when the Parser Agent logged one or more
-    transactions. Tappable: opens the first transaction's inline edit form. %>
-<div id="thinking_<%= chat_message.id %>" class="bubble bubble-incoming bubble-confirmation" data-chat-message-id="<%= chat_message.id %>">
-  <% entries = chat_message.transactions.order(:id) %>
-  <% if entries.size == 1 %>
-    <% tx = entries.first %>
-    <span class="check">✓</span>
-    <%= link_to edit_transaction_path(tx), data: { turbo_frame: dom_id(tx) } do %>
-      Logged: <strong><%= rupiah(tx.amount_cents) %></strong>
-      <%= tx.category %>
-      <% if tx.description.present? %>(<%= tx.description %>)<% end %>
+<div id="thinking_<%= chat_message.id %>" class="flex justify-start px-3 my-1">
+  <div class="max-w-[85%] rounded-2xl rounded-bl-sm bg-white px-3 py-2 text-sm text-gray-800 shadow-sm">
+    <% entries = chat_message.transactions.order(:id) %>
+    <% if entries.size == 1 %>
+      <% tx = entries.first %>
+      <div class="flex items-start gap-2">
+        <span class="text-emerald-600 font-bold">✓</span>
+        <%= link_to edit_transaction_path(tx),
+              data: { turbo_frame: dom_id(tx) },
+              class: "flex-1 -my-1 -mr-1 p-1 rounded hover:bg-gray-50 block" do %>
+          <div class="font-semibold"><%= tx.income? ? "+" : "-" %><%= rupiah(tx.amount_cents) %></div>
+          <div class="text-xs text-gray-500"><%= tx.category %><% if tx.description.present? %> · <%= tx.description %><% end %></div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="flex items-start gap-2">
+        <span class="text-emerald-600 font-bold">✓</span>
+        <div class="flex-1">
+          <div class="font-semibold mb-1">Logged <%= entries.size %> items</div>
+          <ul class="space-y-1">
+            <% entries.each do |tx| %>
+              <li>
+                <%= link_to edit_transaction_path(tx),
+                      data: { turbo_frame: dom_id(tx) },
+                      class: "block -mx-1 px-1 py-0.5 rounded hover:bg-gray-50" do %>
+                  <span class="font-medium"><%= tx.income? ? "+" : "-" %><%= rupiah(tx.amount_cents) %></span>
+                  <span class="text-xs text-gray-500"><%= tx.category %><% if tx.description.present? %> · <%= tx.description %><% end %></span>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
     <% end %>
-  <% else %>
-    <span class="check">✓</span>
-    Logged <%= entries.size %> items:
-    <ul>
-      <% entries.each do |tx| %>
-        <li>
-          <%= link_to edit_transaction_path(tx), data: { turbo_frame: dom_id(tx) } do %>
-            <strong><%= rupiah(tx.amount_cents) %></strong>
-            <%= tx.category %>
-            <% if tx.description.present? %>(<%= tx.description %>)<% end %>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
-  <% end %>
+  </div>
 </div>

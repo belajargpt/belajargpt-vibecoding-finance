@@ -1,7 +1,16 @@
+<% content_for :title, "Chat" %>
+
 <%= turbo_stream_from Current.user %>
 
-<section class="chat">
-  <div id="messages" class="messages">
+<section class="flex flex-col h-[calc(100dvh-3.5rem)]" data-controller="autoscroll">
+  <div id="messages"
+       class="flex-1 overflow-y-auto py-2 bg-[#ECE5DD]"
+       data-autoscroll-target="stream">
+    <% if @chat_messages.empty? %>
+      <div class="flex items-center justify-center h-full text-sm text-gray-500 px-6 text-center">
+        Kirim pesan pertamamu, misalnya "abis beli kopi 25rb".
+      </div>
+    <% end %>
     <% @chat_messages.each do |chat_message| %>
       <%= render "chat_messages/message", chat_message: chat_message %>
       <% case chat_message.parser_status %>
@@ -17,7 +26,7 @@
     <% end %>
   </div>
 
-  <div id="chat_form" class="chat-form-wrapper">
+  <div id="chat_form">
     <%= render "chat_messages/form" %>
   </div>
 </section>

@@ -1,7 +1,7 @@
-<%# Placeholder bubble shown while the Parser Agent works. Replaced by the
-    job with a confirmation / reply / error partial on completion. %>
-<div id="thinking_<%= chat_message.id %>" class="bubble bubble-incoming bubble-thinking">
-  <span class="thinking-dot">•</span>
-  <span class="thinking-dot">•</span>
-  <span class="thinking-dot">•</span>
+<div id="thinking_<%= chat_message.id %>" class="flex justify-start px-3 my-1">
+  <div class="rounded-2xl rounded-bl-sm bg-white px-3 py-2 text-sm text-gray-500 shadow-sm inline-flex gap-1 items-center" aria-label="Parser Agent sedang memproses">
+    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce"></span>
+    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce [animation-delay:150ms]"></span>
+    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce [animation-delay:300ms]"></span>
+  </div>
 </div>

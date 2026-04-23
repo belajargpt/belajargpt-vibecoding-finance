@@ -1,13 +1,17 @@
 <%= turbo_frame_tag dom_id(transaction) do %>
-  <article id="<%= dom_id(transaction) %>" class="transaction transaction-<%= transaction.direction %>">
-    <div class="transaction-date"><%= l(transaction.occurred_on, format: :long) rescue transaction.occurred_on.to_s %></div>
-    <div class="transaction-body">
-      <span class="transaction-description"><%= transaction.description.presence || "-" %></span>
-      <span class="transaction-category">· <%= transaction.category %></span>
+  <article id="<%= dom_id(transaction) %>" class="flex items-center gap-3 px-4 py-3 border-b border-gray-100 bg-white">
+    <div class="flex-1 min-w-0">
+      <div class="flex items-baseline gap-2">
+        <span class="font-medium text-sm text-gray-900 truncate"><%= transaction.description.presence || "-" %></span>
+        <span class="text-xs text-gray-400"><%= l(transaction.occurred_on, format: :long) rescue transaction.occurred_on.to_s %></span>
+      </div>
+      <div class="text-xs text-gray-500"><%= transaction.category %></div>
     </div>
-    <div class="transaction-amount">
-      <%= transaction.income? ? "+" : "-" %><%= rupiah(transaction.amount_cents) %>
+    <div class="text-right">
+      <div class="font-semibold <%= transaction.income? ? 'text-emerald-600' : 'text-red-600' %> tabular-nums">
+        <%= transaction.income? ? "+" : "-" %><%= rupiah(transaction.amount_cents) %>
+      </div>
+      <%= link_to "Edit", edit_transaction_path(transaction), class: "text-xs text-blue-600 hover:underline" %>
     </div>
-    <%= link_to "Edit", edit_transaction_path(transaction), class: "transaction-edit" %>
   </article>
 <% end %>

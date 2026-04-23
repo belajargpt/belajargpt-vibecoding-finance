@@ -1,4 +1,5 @@
-<%# R7: Parser Agent failed or timed out. %>
-<div id="thinking_<%= chat_message.id %>" class="bubble bubble-incoming bubble-error">
-  <%= chat_message.reply_text.presence || "Gagal mencatat, coba lagi." %>
+<div id="thinking_<%= chat_message.id %>" class="flex justify-start px-3 my-1">
+  <div class="max-w-[80%] rounded-2xl rounded-bl-sm bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700 shadow-sm">
+    <%= chat_message.reply_text.presence || "Gagal mencatat, coba lagi." %>
+  </div>
 </div>

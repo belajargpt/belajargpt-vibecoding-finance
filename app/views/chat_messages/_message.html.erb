@@ -1,4 +1,6 @@
-<%# Outgoing bubble — the user's raw message. %>
-<div id="<%= dom_id(chat_message) %>" class="bubble bubble-outgoing">
-  <%= chat_message.content %>
+<div id="<%= dom_id(chat_message) %>" class="flex justify-end px-3 my-1">
+  <div class="max-w-[80%] rounded-2xl rounded-br-sm bg-[#DCF8C6] px-3 py-2 text-sm text-gray-800 shadow-sm whitespace-pre-wrap">
+    <%= chat_message.content %>
+    <div class="text-[10px] text-gray-500 text-right mt-1"><%= l(chat_message.created_at, format: :short) rescue chat_message.created_at.strftime("%H:%M") %></div>
+  </div>
 </div>
