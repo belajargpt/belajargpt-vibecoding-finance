@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_23_135654) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_23_140042) do
+  create_table "chat_messages", force: :cascade do |t|
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.integer "parser_status", default: 0, null: false
+    t.text "reply_text"
+    t.integer "role", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id", "created_at"], name: "index_chat_messages_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_chat_messages_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -18,6 +30,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_23_135654) do
     t.string "user_agent"
     t.integer "user_id", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "transactions", force: :cascade do |t|
+    t.integer "amount_cents", null: false
+    t.string "category", null: false
+    t.integer "chat_message_id"
+    t.datetime "created_at", null: false
+    t.string "description"
+    t.integer "direction", null: false
+    t.date "occurred_on", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_message_id"], name: "index_transactions_on_chat_message_id"
+    t.index ["occurred_on"], name: "index_transactions_on_occurred_on", order: :desc
   end
 
   create_table "users", force: :cascade do |t|
@@ -28,5 +53,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_23_135654) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "chat_messages", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "transactions", "chat_messages", on_delete: :nullify
 end

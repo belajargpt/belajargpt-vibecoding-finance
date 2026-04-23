@@ -1,6 +1,8 @@
 class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
+  has_many :chat_messages, dependent: :destroy
+  has_many :transactions, through: :chat_messages
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 end

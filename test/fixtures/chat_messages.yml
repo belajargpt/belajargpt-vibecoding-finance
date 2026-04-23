@@ -1,0 +1,11 @@
+logged_batagor:
+  user: owner
+  role: outgoing
+  content: "abis beli batagor 5rb"
+  parser_status: logged
+
+pending_message:
+  user: owner
+  role: outgoing
+  content: "beli nasi 25rb"
+  parser_status: pending

@@ -1,0 +1,7 @@
+batagor:
+  chat_message: logged_batagor
+  amount_cents: 5000
+  direction: expense
+  category: "Makanan & Minuman"
+  occurred_on: <%= Date.current.to_s %>
+  description: "batagor"
