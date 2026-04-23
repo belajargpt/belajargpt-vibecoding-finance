@@ -7,7 +7,7 @@ image: finance_chatbot
 # Deploy to these servers.
 servers:
   web:
-    - 192.168.0.1
+    - 103.93.160.173
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -20,9 +20,9 @@ servers:
 #
 # Don't use this when deploying to multiple web servers (then you have to terminate SSL at your load balancer).
 #
-# proxy:
-#   ssl: true
-#   host: app.example.com
+proxy:
+  ssl: true
+  host: financetracker.belajarcodex.com
 
 # Where you keep your container images.
 registry:
@@ -91,8 +91,8 @@ builder:
   #   - RAILS_MASTER_KEY
 
 # Use a different ssh user than root
-# ssh:
-#   user: app
+ssh:
+  user: deploy
 
 # Use accessory services (secrets come from .kamal/secrets).
 # accessories:
