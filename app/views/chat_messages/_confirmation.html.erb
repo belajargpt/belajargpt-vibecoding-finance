@@ -1,36 +1,38 @@
 <div id="thinking_<%= chat_message.id %>" class="flex justify-start px-3 my-1">
   <div class="max-w-[85%] rounded-2xl rounded-bl-sm bg-white px-3 py-2 text-sm text-gray-800 shadow-sm">
     <% entries = chat_message.transactions.order(:id) %>
+
+    <% if chat_message.reply_text.present? %>
+      <div class="text-gray-800 mb-1.5"><%= chat_message.reply_text %></div>
+    <% end %>
+
     <% if entries.size == 1 %>
       <% tx = entries.first %>
-      <div class="flex items-start gap-2">
+      <%= link_to edit_transaction_path(tx),
+            data: { turbo_frame: dom_id(tx) },
+            class: "flex items-center gap-1.5 text-xs -mx-1 px-1 py-0.5 rounded hover:bg-gray-50" do %>
         <span class="text-emerald-600 font-bold">✓</span>
-        <%= link_to edit_transaction_path(tx),
-              data: { turbo_frame: dom_id(tx) },
-              class: "flex-1 -my-1 -mr-1 p-1 rounded hover:bg-gray-50 block" do %>
-          <div class="font-semibold"><%= tx.income? ? "+" : "-" %><%= rupiah(tx.amount_cents) %></div>
-          <div class="text-xs text-gray-500"><%= tx.category %><% if tx.description.present? %> · <%= tx.description %><% end %></div>
-        <% end %>
-      </div>
+        <span class="font-semibold <%= tx.income? ? 'text-emerald-600' : 'text-gray-700' %> tabular-nums">
+          <%= tx.income? ? "+" : "-" %><%= rupiah(tx.amount_cents) %>
+        </span>
+        <span class="text-gray-500">· <%= tx.category %><% if tx.description.present? %> · <%= tx.description %><% end %></span>
+      <% end %>
     <% else %>
-      <div class="flex items-start gap-2">
-        <span class="text-emerald-600 font-bold">✓</span>
-        <div class="flex-1">
-          <div class="font-semibold mb-1">Logged <%= entries.size %> items</div>
-          <ul class="space-y-1">
-            <% entries.each do |tx| %>
-              <li>
-                <%= link_to edit_transaction_path(tx),
-                      data: { turbo_frame: dom_id(tx) },
-                      class: "block -mx-1 px-1 py-0.5 rounded hover:bg-gray-50" do %>
-                  <span class="font-medium"><%= tx.income? ? "+" : "-" %><%= rupiah(tx.amount_cents) %></span>
-                  <span class="text-xs text-gray-500"><%= tx.category %><% if tx.description.present? %> · <%= tx.description %><% end %></span>
-                <% end %>
-              </li>
+      <ul class="space-y-0.5 mt-1">
+        <% entries.each do |tx| %>
+          <li>
+            <%= link_to edit_transaction_path(tx),
+                  data: { turbo_frame: dom_id(tx) },
+                  class: "flex items-center gap-1.5 text-xs -mx-1 px-1 py-0.5 rounded hover:bg-gray-50" do %>
+              <span class="text-emerald-600 font-bold">✓</span>
+              <span class="font-semibold <%= tx.income? ? 'text-emerald-600' : 'text-gray-700' %> tabular-nums">
+                <%= tx.income? ? "+" : "-" %><%= rupiah(tx.amount_cents) %>
+              </span>
+              <span class="text-gray-500">· <%= tx.category %><% if tx.description.present? %> · <%= tx.description %><% end %></span>
             <% end %>
-          </ul>
-        </div>
-      </div>
+          </li>
+        <% end %>
+      </ul>
     <% end %>
   </div>
 </div>

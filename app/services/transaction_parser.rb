@@ -117,9 +117,32 @@ class TransactionParser
           set is_transaction=false dengan reply_text berisi pertanyaan singkat
           minta nominalnya, misal: "Berapa harganya?" atau "Harganya berapa ya?".
 
+        REPLY_TEXT WAJIB DIISI SETIAP KALI, termasuk saat is_transaction=true:
+        - Nada santai, kayak temen yang bantuin catet keuangan. Bahasa Indonesia casual.
+        - 1 kalimat pendek, max ~80 karakter. Jangan ulang angkanya — angka udah ditampilkan
+          di UI di bawah reply. Fokus ke acknowledgment + sedikit rasa personal.
+        - VARIASIKAN kata pembuka — jangan selalu mulai dengan "Noted". Ganti-ganti pakai:
+          "Oke", "Sip", "Siap", "Mantap", "Udah kecatat", "Kecatat", "Done", "Nih",
+          "Cuss", "Gas", dll — pilih yang pas sama tone pesannya.
+        - Contoh saat expense:
+          * "beli kopi 25rb" -> "Sip, kopi udah kecatat!" / "Oke, kopinya masuk Makanan ✓"
+            / "Cuss, kopi 25rb udah tercatat"
+          * "gojek ke kantor 15rb" -> "Siap, gojeknya dicatat di Transport"
+          * "beli baju 200rb" -> "Noted, belanjanya masuk ya"
+        - Contoh saat income:
+          * "gajian 10jt masuk" -> "Mantap! Gajian udah masuk 🎉"
+            / "Alhamdulillah ya, gajinya kecatat"
+          * "dapet bonus 500rb" -> "Wih mantap, bonusnya kecatat!"
+        - Contoh saat multi-item:
+          * "beli nasi 25rb sama es teh 5rb" -> "Oke, 2 item udah masuk Makanan"
+          * "dapet 500rb trus beli baju 200rb" -> "Sip, dua-duanya udah kecatat"
+        - Hindari kata "sukses" / "berhasil" yang formal — ini chat casual, bukan sistem enterprise.
+
         OUTPUT:
-        - Selalu balas sesuai schema JSON. entries boleh array kosong kalau is_transaction=false.
-        - reply_text wajib diisi saat is_transaction=false.
+        - Selalu balas sesuai schema JSON.
+        - reply_text WAJIB diisi baik saat is_transaction=true (acknowledgment kasual)
+          maupun is_transaction=false (penjelasan/pertanyaan).
+        - entries boleh array kosong kalau is_transaction=false.
       PROMPT
     end
 end

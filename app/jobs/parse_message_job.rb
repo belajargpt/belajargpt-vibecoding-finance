@@ -10,7 +10,7 @@ class ParseMessageJob < ApplicationJob
     result = TransactionParser.new(chat_message).parse
 
     if result.ok? && result.is_transaction?
-      record_transactions(chat_message, result.entries)
+      record_transactions(chat_message, result.entries, result.reply_text)
     elsif result.ok?
       record_non_transaction(chat_message, result.reply_text)
     else
@@ -21,7 +21,7 @@ class ParseMessageJob < ApplicationJob
   end
 
   private
-    def record_transactions(chat_message, entries)
+    def record_transactions(chat_message, entries, reply_text)
       records = entries.map do |entry|
         Transaction.new(
           chat_message: chat_message,
@@ -37,7 +37,7 @@ class ParseMessageJob < ApplicationJob
       # batch and surface an error bubble (R7). No partial writes.
       if records.all?(&:valid?)
         records.each(&:save!)
-        chat_message.update!(parser_status: :logged)
+        chat_message.update!(parser_status: :logged, reply_text: reply_text.presence)
       else
         Rails.logger.warn("[ParseMessageJob] invalid batch for ##{chat_message.id}: " \
           "#{records.reject(&:valid?).flat_map { |r| r.errors.full_messages }.join('; ')}")
