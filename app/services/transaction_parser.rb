@@ -77,8 +77,13 @@ class TransactionParser
         .reverse
     end
 
+    # Kata-kata yang nunjukin AI lagi ngonfirmasi transaksi. Kalau muncul di
+    # reply_text sementara is_transaction=false, AI-nya bohong ke user.
+    CONFIRMATION_WORDS = /\b(kecatat|kecatet|tercatat|dicatat|udah\s+masuk|masuk\s+(ledger|makanan|transport|belanja|hiburan|tagihan|kesehatan|lainnya|gaji|income)|saved|logged|done)\b/i
+
     def build_result(parsed)
       entries = Array(parsed["entries"]).map(&:symbolize_keys)
+      raw_reply = parsed["reply_text"].to_s
 
       # Guard: is_transaction=true with empty entries is treated as non-transaction
       # so the UI path in F4 handles it cleanly (no row, polite reply).
@@ -87,15 +92,25 @@ class TransactionParser
           ok: true,
           is_transaction: true,
           entries: entries,
-          reply_text: parsed["reply_text"].presence,
+          reply_text: raw_reply.presence,
           error: nil
         )
       else
+        # Safety net: AI kadang bilang "udah kecatat!" tapi set is_transaction=false.
+        # Ganti reply_text supaya user nggak mikir transaksi berhasil padahal belum.
+        safe_reply = if raw_reply.match?(CONFIRMATION_WORDS)
+          Rails.logger.warn("[TransactionParser] inconsistent output for ##{@chat_message.id}: " \
+            "is_transaction=false but reply mentions confirmation: #{raw_reply.inspect}")
+          "Hmm, aku kurang yakin. Coba tulis lebih detail ya — misal 'beli kopi 25rb'."
+        else
+          raw_reply.presence || "Gak ada transaksi yang kecatat dari pesan itu."
+        end
+
         Result.new(
           ok: true,
           is_transaction: false,
           entries: [],
-          reply_text: parsed["reply_text"].presence || "Gak ada transaksi yang kecatat dari pesan itu.",
+          reply_text: safe_reply,
           error: nil
         )
       end
@@ -150,9 +165,26 @@ class TransactionParser
         ATURAN NON-TRANSAKSI:
         - Kalau pesannya sapaan / obrolan / perintah app ("halo", "oke", "liat ledger"),
           set is_transaction=false dengan reply_text menjelaskan singkat tidak ada yang dicatat.
-        - Kalau pesannya JELAS transaksi tapi TIDAK ADA nominal ("abis beli batagor", "beli bensin"),
+        - Kalau pesannya JELAS transaksi tapi TIDAK ADA nominal ("abis beli batagor", "beli bensin")
+          DAN konteks sebelumnya juga nggak kasih nominalnya,
           set is_transaction=false dengan reply_text berisi pertanyaan singkat
           minta nominalnya, misal: "Berapa harganya?" atau "Harganya berapa ya?".
+
+        ATURAN FOLLOW-UP (PENTING — sering salah):
+        - Kalau konteks sebelumnya kamu nanya harga / direction / detail ke user,
+          dan pesan sekarang ngasih info yang kurang (contoh: "3rb", "expense", "kopi"),
+          GABUNGIN konteks + pesan sekarang jadi entri lengkap:
+            Contoh:
+              Sebelumnya user: "abis beli batagor"
+              Sebelumnya kamu: "Berapa harganya?"
+              Sekarang user: "3rb"
+              -> is_transaction=TRUE, entries=[{3000, expense, "Makanan & Minuman", today, "batagor"}]
+        - KONSISTENSI MUTLAK: kalau reply_text kamu mengandung kata "kecatat",
+          "masuk", "dicatat", "saved", "done" atau bentuk konfirmasi LAINNYA,
+          is_transaction WAJIB true dan entries WAJIB diisi. JANGAN PERNAH bilang
+          "udah kecatat" sementara is_transaction=false — itu kebohongan ke user.
+        - Kalau kamu nggak yakin (info masih kurang), reply_text-nya TANYA lagi,
+          jangan bilang "udah kecatat".
 
         REPLY_TEXT WAJIB DIISI SETIAP KALI, termasuk saat is_transaction=true:
         - Nada santai, kayak temen yang bantuin catet keuangan. Bahasa Indonesia casual.
